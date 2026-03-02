@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:5002/api'
+// allow override from environment so port can be configured for dev/prod
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+console.log('API_URL:', API_URL);
 
 
 export const loginUser = async (loginData) => {
@@ -74,3 +76,36 @@ export const deleteWorkoutPlan = async (planID) => {
   })
   return response.data
 }
+
+// metrics & goals
+export const logMetric = async (userId, type, value, date) => {
+  const body = { userId, type, value };
+  if (date) body.date = date;
+  const response = await axios.post(`${API_URL}/metrics/log`, body);
+  return response.data;
+};
+
+export const getMetrics = async (userId, start, end) => {
+  const params = {};
+  if (start) params.start = start;
+  if (end) params.end = end;
+  const response = await axios.get(`${API_URL}/metrics/${userId}`, { params });
+  return response.data;
+};
+
+export const getGoals = async (userId) => {
+  const response = await axios.get(`${API_URL}/goals/${userId}`);
+  return response.data;
+};
+
+export const updateGoals = async (userId, goals) => {
+  const response = await axios.put(`${API_URL}/goals/${userId}`, goals);
+  return response.data;
+};
+
+export const getAnalysis = async (userId, days) => {
+  const params = {};
+  if (days) params.days = days;
+  const response = await axios.get(`${API_URL}/analytics/${userId}`, { params });
+  return response.data;
+};
